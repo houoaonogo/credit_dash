@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
-
-
 import dash
 from dash import dcc, html, Input, Output, dash_table
 import plotly.express as px
 import pandas as pd
 
+# 讀取數據（請確保 UCI_Credit_Card.csv 和 app.py 放在同一個專案目錄下）
 df = pd.read_csv("UCI_Credit_Card.csv")
 all_cols = df.columns.tolist()
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
+server = app.server  # 讓 Render 的 gunicorn 可以偵測並啟動
 
 app.layout = html.Div([
     html.H1("信用卡資料全方位探索系統", style={'textAlign': 'center'}),
@@ -20,7 +19,7 @@ app.layout = html.Div([
         dcc.Tab(label='數據總覽', value='tab-1'),
         dcc.Tab(label='趨勢與相關性', value='tab-2'),
         dcc.Tab(label='類別違約分析', value='tab-3'),
-    ]),http://localhost:8888/notebooks/credict_card_dash.ipynb#
+    ]),
     html.Div(id='tabs-content'),
     html.Div([
         html.Button("下載數據檔案", id="btn-download", style={'margin-top': '20px'}),
@@ -91,11 +90,4 @@ def download_data(n_clicks):
     return dcc.send_data_frame(df.to_csv, "UCI_Credit_Card_Export.csv")
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-# In[ ]:
-
-
-
-
+    app.run_server(host='0.0.0.0', port=8050, debug=False)
